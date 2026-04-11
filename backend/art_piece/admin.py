@@ -1,9 +1,9 @@
 from django.contrib import admin
-from .models import Artwork, Architecture, Sculpture, Photography, Other
+from .models import Painting, Architecture, Sculpture, Photography, Other
 
-@admin.register(Artwork)
-class ArtworkAdmin(admin.ModelAdmin):
-    list_display = ["id", "title", "artist"]
+@admin.register(Painting)
+class PaintingAdmin(admin.ModelAdmin):
+    list_display = ["id", "title", "artist", "category"]
 
 @admin.register(Architecture)
 class ArchitectureAdmin(admin.ModelAdmin):
