@@ -10,7 +10,8 @@ category_view = ArtPieceViewSet.as_view({
 })
 
 detail_view = ArtPieceViewSet.as_view({
-    "get": "retrieve_by_category"
+    "get": "retrieve_by_id",
+    "delete": "delete_by_id"
 })
 
 urlpatterns = [

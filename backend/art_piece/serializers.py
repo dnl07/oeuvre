@@ -62,7 +62,7 @@ class ArtPiecePolymorphicSerializer(serializers.Serializer):
         category = validated_data.get("category")
         model = models.MODEL_MAP.get(category)
         return model.objects.create(**validated_data)
-    
+
     def update(self, instance, validated_data):
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
