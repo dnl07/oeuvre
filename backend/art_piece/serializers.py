@@ -1,5 +1,6 @@
 from . import models
 from rest_framework import serializers
+from drf_spectacular.utils import PolymorphicProxySerializer
 
 class PaintingSerializer(serializers.ModelSerializer):
     class Meta:
@@ -52,7 +53,10 @@ class ArtPiecePolymorphicSerializer(serializers.Serializer):
         serializer_class = self.get_serializer(category)
         inner = serializer_class(data=data, context=self.context)
         inner.is_valid(raise_exception=True)
-        return inner.validated_data
+
+        validated = inner.validated_data
+        validated["category"] = category
+        return validated
 
     def create(self, validated_data):
         category = validated_data.get("category")
@@ -64,3 +68,16 @@ class ArtPiecePolymorphicSerializer(serializers.Serializer):
             setattr(instance, attr, value)
         instance.save()
         return instance
+    
+# For swagger
+ArtPieceSwaggerSerializer = PolymorphicProxySerializer(
+    component_name="ArtPiece",
+    serializers=[
+        PaintingSerializer,
+        ArchitectureSerializer,
+        SculptureSerializer,
+        PhotographySerializer,
+        OtherSerializer
+    ],
+    resource_type_field_name="category"
+)

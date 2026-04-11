@@ -1,24 +1,38 @@
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response 
-from rest_framework.decorators import action
 from django.shortcuts import get_object_or_404
-
+from drf_spectacular.utils import extend_schema
 from . import models
-from . import serializers
+from .serializers import ArtPiecePolymorphicSerializer, ArtPieceSwaggerSerializer
 from itertools import chain
 
 class ArtPieceViewSet(ViewSet):
-    def list(self, request):
-        queryset = list(chain(*[m.objects.all() for m in models.MODEL_MAP.values()]))
-        serializer = serializers.ArtPiecePolymorphicSerializer(queryset, many=True)
-        return Response(serializer.data)
+    serializer_class = ArtPiecePolymorphicSerializer
 
-    @action(detail=False, methods=["GET"], url_path=r"(?P<category>[^/.]+)/(?P<id>[0-9]+)")
-    def retrieve_by_category(self, request, category=None, id=None):
+    def get_model_or_400(category: str):
         model = models.MODEL_MAP.get(category)
         if not model:
-            return Response({"error": f"Unknown category: {category}"})
-        
-        instance = get_object_or_404(model, pk=id)
-        serializer = serializers.ArtPiecePolymorphicSerializer(instance)
+            return Response({"error": f"Unknown category: {category}"}, status=400)
+
+    def list(self, request):
+        queryset = list(chain(*[m.objects.all() for m in models.MODEL_MAP.values()]))
+        serializer = ArtPiecePolymorphicSerializer(queryset, many=True)
         return Response(serializer.data)
+
+    def retrieve_by_category(self, request, category=None, id=None):
+        model = self.get_model_or_400(category)
+        instance = get_object_or_404(model, pk=id)
+        serializer = ArtPiecePolymorphicSerializer(instance)
+        return Response(serializer.data)
+    
+    @extend_schema(request=ArtPieceSwaggerSerializer)
+    def create_by_category(self, request, category=None):
+        data = request.data.copy()
+        print(category)
+        data["category"] = category
+
+        serializer = ArtPiecePolymorphicSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)        

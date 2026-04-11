@@ -1,10 +1,20 @@
 from django.urls import path
-from rest_framework.routers import DefaultRouter
-from . import views
+from .views import ArtPieceViewSet
 
-router = DefaultRouter()
-router.register(r"art-pieces", views.ArtPieceViewSet, basename="art-piece")
+list_view = ArtPieceViewSet.as_view({
+    "get": "list"
+})
+
+category_view = ArtPieceViewSet.as_view({
+    "post": "create_by_category"
+})
+
+detail_view = ArtPieceViewSet.as_view({
+    "get": "retrieve_by_category"
+})
 
 urlpatterns = [
-    *router.urls
+    path("art-pieces/", list_view),
+    path("art-pieces/<str:category>/", category_view),
+    path("art-pieces/<str:category>/<int:id>", detail_view)
 ]
