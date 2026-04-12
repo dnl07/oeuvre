@@ -11,6 +11,8 @@ CATEGORY_CHOICES = [
 ]
 
 class ArtPieceBase(models.Model):
+    """Abstract base model for art pieces with common fields and logic."""
+
     title = models.CharField(max_length=255)
     category = models.CharField(max_length=15, choices=CATEGORY_CHOICES, editable=False)
     slug = models.SlugField(unique=True)
@@ -32,16 +34,16 @@ class ArtPieceBase(models.Model):
         super().save(*args, **kwargs)
 
 class Painting(ArtPieceBase):
-    artist = models.CharField(max_length=100)
+    artist = models.CharField(max_length=100, null=True, blank=True)
 
 class Architecture(ArtPieceBase):
-    architect = models.CharField(max_length=100)
+    architect = models.CharField(max_length=100, null=True, blank=True)
 
 class Sculpture(ArtPieceBase):
-    artist = models.CharField(max_length=100)
+    artist = models.CharField(max_length=100, null=True, blank=True)
 
 class Photography(ArtPieceBase):
-    photographer = models.CharField(max_length=100)
+    photographer = models.CharField(max_length=100, null=True, blank=True)
 
 class Other(ArtPieceBase):
     pass

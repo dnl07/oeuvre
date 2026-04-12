@@ -4,6 +4,7 @@ from drf_spectacular.utils import PolymorphicProxySerializer
 from images.serializers import ImageSerializer, UploadedImagesField
 from images.models import Image
 
+# Base serializer with common fields
 class ArtPieceBaseSerializer(serializers.ModelSerializer):
     images = ImageSerializer(many=True, read_only=True)
     uploaded_images = UploadedImagesField(write_only=True)
@@ -11,6 +12,7 @@ class ArtPieceBaseSerializer(serializers.ModelSerializer):
     class Meta:
         abstract = True
 
+# Specific serializers for each category
 class PaintingSerializer(ArtPieceBaseSerializer):
     class Meta:
         model = models.Painting
@@ -36,6 +38,7 @@ class OtherSerializer(ArtPieceBaseSerializer):
         model = models.Other
         fields = "__all__"
 
+# Map category to model and serializer
 SERIALIZER_MAP = {
     "painting": PaintingSerializer,
     "architecture": ArchitectureSerializer,
@@ -44,6 +47,7 @@ SERIALIZER_MAP = {
     "other": OtherSerializer,    
 }
 
+# Polymorphic serializer that delegates to the correct serializer based on the category
 class ArtPiecePolymorphicSerializer(serializers.Serializer):
     def get_serializer(self, category):
         serializer_class = SERIALIZER_MAP.get(category)
@@ -84,3 +88,25 @@ class ArtPiecePolymorphicSerializer(serializers.Serializer):
             setattr(instance, attr, value)
         instance.save()
         return instance
+    
+# Serializer for Swagger documentation
+ArtPieceSwaggerSerializer = PolymorphicProxySerializer(
+    component_name="ArtPiece",
+    serializers=list(SERIALIZER_MAP.values()),
+    resource_type_field_name="category"
+)
+
+class ArtPieceCreateRequestSerializer(serializers.Serializer):
+    title           = serializers.CharField()
+    slug            = serializers.SlugField()
+    artist          = serializers.CharField(required=False, help_text="Painting, Sculpture")
+    architect       = serializers.CharField(required=False, help_text="Architecture")
+    photographer    = serializers.CharField(required=False, help_text="Photography")
+    uploaded_images = UploadedImagesField()
+
+class ArtPiecePatchRequestSerializer(serializers.Serializer):
+    title           = serializers.CharField(required=False)
+    slug            = serializers.SlugField(required=False)
+    artist          = serializers.CharField(required=False, help_text="Painting, Sculpture")
+    architect       = serializers.CharField(required=False, help_text="Architecture")
+    photographer    = serializers.CharField(required=False, help_text="Photography")
