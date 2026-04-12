@@ -12,22 +12,26 @@ class ImageInlineAdmin(GenericTabularInline):
 
 @admin.register(Painting)
 class PaintingAdmin(admin.ModelAdmin):
-    list_display = ["id", "title", "artist", "category"]
+    list_display = ["id", "title"]
     readonly_fields = ["slug", "created_at"]
     inlines = [ImageInlineAdmin, ]
 
 @admin.register(Architecture)
 class ArchitectureAdmin(admin.ModelAdmin):
-    list_display = ["id", "title", "architect"]
+    list_display = ["id", "title"]
+    readonly_fields = ["slug", "created_at"]
 
 @admin.register(Sculpture)
 class SculptureAdmin(admin.ModelAdmin):
-    list_display = ["id", "title", "artist"]
+    list_display = ["id", "title"]
+    readonly_fields = ["slug", "created_at"]
 
 @admin.register(Photography)
 class PhotographyAdmin(admin.ModelAdmin):
-    list_display = ["id", "title", "photographer"]
+    list_display = ["id", "title"]
+    readonly_fields = ["slug", "created_at"]
 
 @admin.register(Other)
 class OtherAdmin(admin.ModelAdmin):
-    list_display = ["title"]
+    list_display = ["id", "title"]
+    readonly_fields = ["slug", "created_at"]

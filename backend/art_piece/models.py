@@ -18,6 +18,8 @@ class ArtPieceBase(models.Model):
     category = models.CharField(max_length=15, choices=CATEGORY_CHOICES, editable=False)
     slug = models.SlugField(unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    location = models.CharField(max_length=255, blank=True, null=True)
+    year = models.CharField(max_length=10, blank=True, null=True)
 
     images = GenericRelation(Image)
 
@@ -45,16 +47,20 @@ class ArtPieceBase(models.Model):
         super().save(*args, **kwargs)
 
 class Painting(ArtPieceBase):
-    artist = models.CharField(max_length=100, null=True, blank=True)
+    artist = models.CharField(max_length=255, blank=True, null=True)
+    technique = models.CharField(max_length=255, blank=True, null=True)
+    measurements = models.CharField(max_length=255, blank=True, null=True)
 
 class Architecture(ArtPieceBase):
-    architect = models.CharField(max_length=100, null=True, blank=True)
+    architect = models.CharField(max_length=255, blank=True, null=True)
 
 class Sculpture(ArtPieceBase):
-    artist = models.CharField(max_length=100, null=True, blank=True)
+    artist = models.CharField(max_length=255, blank=True, null=True)
+    material = models.CharField(max_length=255, blank=True, null=True)
 
 class Photography(ArtPieceBase):
-    photographer = models.CharField(max_length=100, null=True, blank=True)
+    photographer = models.CharField(max_length=255, blank=True, null=True)
+    camera = models.CharField(max_length=255, blank=True, null=True)
 
 class Other(ArtPieceBase):
     pass
