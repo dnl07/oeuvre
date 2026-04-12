@@ -6,9 +6,11 @@ from drf_spectacular.utils import extend_schema
 from . import serializers
 from . import models
 from itertools import chain
+from images.models import Image
+
 
 class ArtPieceViewSet(ViewSet):
-    """"ViewSet for handling CRUD operations on art pieces across multiple categories."""
+    """ViewSet for handling CRUD operations on art pieces across multiple categories."""
     serializer_class = serializers.ArtPiecePolymorphicSerializer
     parser_classes = [MultiPartParser, FormParser, JSONParser]
 
@@ -88,3 +90,34 @@ class ArtPieceViewSet(ViewSet):
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)        
     
+    @extend_schema(request={
+            "multipart/form-data": serializers.ArtPieceAddImageRequestSerializer}
+    )
+    def add_images(self, request, category=None, id=None):
+        model, error = self.get_model_or_400(category)
+
+        if error:
+            return error
+        
+        instance = get_object_or_404(model, pk=id)
+        images = request.FILES.getlist("uploaded_images")
+
+        for image in images:
+            Image.objects.create(content_object=instance, image=image)
+    
+        serializer = serializers.ArtPiecePolymorphicSerializer(instance)
+        return Response(serializer.data)        
+    
+    def delete_image(self, request, category=None, id=None, image_id=None):
+        model, error = self.get_model_or_400(category)
+
+        if error:
+            return error
+        
+        instance = get_object_or_404(model, pk=id)
+        image = instance.images.filter(pk=image_id)
+
+        image.delete()
+
+        serializer = serializers.ArtPiecePolymorphicSerializer(instance)
+        return Response(serializer.data)

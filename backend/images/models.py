@@ -4,7 +4,6 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 
 class Image(models.Model):
     image = models.ImageField(upload_to="images/")
-    alt_text = models.CharField(max_length=255, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)

@@ -5,7 +5,7 @@ from drf_spectacular.utils import extend_schema_field
 class ImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Image
-        fields = ["id", "image", "alt_text", "created_at"]
+        fields = ["id", "image", "created_at"]
         
 @extend_schema_field({
     "type": "array",

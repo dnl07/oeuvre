@@ -130,3 +130,6 @@ class ArtPiecePatchRequestSerializer(serializers.Serializer):
     photographer = serializers.CharField(required=False, help_text="Photography")
     camera = serializers.CharField(required=False, help_text="Photography")
     material = serializers.CharField(required=False, help_text="Sculpture")
+
+class ArtPieceAddImageRequestSerializer(serializers.Serializer):
+    uploaded_images = UploadedImagesField()
