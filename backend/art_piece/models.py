@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.contenttypes.fields import GenericRelation
 from images.models import Image
+from django.utils.text import slugify
 
 CATEGORY_CHOICES = [
     ("painting", "Painting"),
@@ -24,6 +25,7 @@ class ArtPieceBase(models.Model):
         abstract = True
 
     def save(self, *args, **kwargs):
+        # Automatically set the category based on the model name
         category = self.__class__.__name__.lower();
         allowed = [choice[0] for choice in CATEGORY_CHOICES]
 
@@ -31,6 +33,15 @@ class ArtPieceBase(models.Model):
             raise ValueError(f"{category} is not a valid category")
 
         self.category = category
+
+        if not self.slug or not self.slug.startswith(slugify(self.title)):
+            self.slug = slugify(self.title)
+            unique_slug = self.slug
+            counter = 1
+
+            while MODEL_MAP.get(self.category).objects.filter(slug=self.slug).exists():
+                self.slug = f"{unique_slug}-{counter}"
+                counter += 1
         super().save(*args, **kwargs)
 
 class Painting(ArtPieceBase):
