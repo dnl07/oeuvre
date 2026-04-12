@@ -1,5 +1,6 @@
 from django.db import models
-
+from django.contrib.contenttypes.fields import GenericRelation
+from images.models import Image
 
 CATEGORY_CHOICES = [
     ("painting", "Painting"),
@@ -13,7 +14,9 @@ class ArtPieceBase(models.Model):
     title = models.CharField(max_length=255)
     category = models.CharField(max_length=15, choices=CATEGORY_CHOICES, editable=False)
     slug = models.SlugField(unique=True)
-    created_date = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    images = GenericRelation(Image)
 
     class Meta:
         abstract = True

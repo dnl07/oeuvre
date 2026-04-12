@@ -1,28 +1,37 @@
 from . import models
 from rest_framework import serializers
 from drf_spectacular.utils import PolymorphicProxySerializer
+from images.serializers import ImageSerializer, UploadedImagesField
+from images.models import Image
 
-class PaintingSerializer(serializers.ModelSerializer):
+class ArtPieceBaseSerializer(serializers.ModelSerializer):
+    images = ImageSerializer(many=True, read_only=True)
+    uploaded_images = UploadedImagesField(write_only=True)
+    
+    class Meta:
+        abstract = True
+
+class PaintingSerializer(ArtPieceBaseSerializer):
     class Meta:
         model = models.Painting
         fields = "__all__"
 
-class ArchitectureSerializer(serializers.ModelSerializer):
+class ArchitectureSerializer(ArtPieceBaseSerializer):
     class Meta:
         model = models.Architecture
         fields = "__all__"
 
-class SculptureSerializer(serializers.ModelSerializer):
+class SculptureSerializer(ArtPieceBaseSerializer):
     class Meta:
         model = models.Sculpture
         fields = "__all__"
 
-class PhotographySerializer(serializers.ModelSerializer):
+class PhotographySerializer(ArtPieceBaseSerializer):
     class Meta:
         model = models.Photography
         fields = "__all__"
 
-class OtherSerializer(serializers.ModelSerializer):
+class OtherSerializer(ArtPieceBaseSerializer):
     class Meta:
         model = models.Other
         fields = "__all__"
@@ -49,9 +58,9 @@ class ArtPiecePolymorphicSerializer(serializers.Serializer):
     def to_internal_value(self, data):
         category = data.get("category")
         if not category:
-            raise serializers.ValidationError({"category": "Mandatory field"})
+            raise serializers.ValidationError({"category": "Required field"})
         serializer_class = self.get_serializer(category)
-        inner = serializer_class(data=data, context=self.context)
+        inner = serializer_class(self.instance, data=data, context=self.context, partial=self.partial)
         inner.is_valid(raise_exception=True)
 
         validated = inner.validated_data
@@ -59,25 +68,19 @@ class ArtPiecePolymorphicSerializer(serializers.Serializer):
         return validated
 
     def create(self, validated_data):
-        category = validated_data.get("category")
+        category = validated_data.pop("category")
+        uploaded_images = validated_data.pop("uploaded_images", [])
+
         model = models.MODEL_MAP.get(category)
-        return model.objects.create(**validated_data)
+        instance = model.objects.create(**validated_data)
+
+        for img in uploaded_images:
+            Image.objects.create(content_object=instance, image=img)
+
+        return instance
 
     def update(self, instance, validated_data):
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
         return instance
-    
-# For swagger
-ArtPieceSwaggerSerializer = PolymorphicProxySerializer(
-    component_name="ArtPiece",
-    serializers=[
-        PaintingSerializer,
-        ArchitectureSerializer,
-        SculptureSerializer,
-        PhotographySerializer,
-        OtherSerializer
-    ],
-    resource_type_field_name="category"
-)
