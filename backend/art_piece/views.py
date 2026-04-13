@@ -7,6 +7,8 @@ from . import serializers
 from . import models
 from itertools import chain
 from images.models import Image
+from .filters import ArtPiecePolymorphicFilter
+from .swagger import art_piece_list_schema
 
 
 class ArtPieceViewSet(ViewSet):
@@ -14,7 +16,7 @@ class ArtPieceViewSet(ViewSet):
     serializer_class = serializers.ArtPiecePolymorphicSerializer
     parser_classes = [MultiPartParser, FormParser, JSONParser]
 
-    def get_model_or_400(self, category: str):
+    def _get_model_or_400(self, category: str):
         """Helper method to get the model class based on category or 
         return a 400 response if category is invalid."""
 
@@ -23,10 +25,11 @@ class ArtPieceViewSet(ViewSet):
             return None, Response({"error": f"Unknown category: {category}"}, status=400)
         return model, None
 
+    @art_piece_list_schema()
     def list(self, request):
         """List all art pieces across all categories."""
 
-        queryset = list(chain(*[m.objects.all() for m in models.MODEL_MAP.values()]))
+        queryset = ArtPiecePolymorphicFilter(request.query_params).apply()
         serializer = serializers.ArtPiecePolymorphicSerializer(queryset, many=True)
         return Response(serializer.data)
 
@@ -95,7 +98,7 @@ class ArtPieceViewSet(ViewSet):
     )
     def add_images(self, request, category=None, id=None):
         """Add images to a specific art piece by category and ID."""
-
+ 
         model, error = self.get_model_or_400(category)
 
         if error:
@@ -112,7 +115,7 @@ class ArtPieceViewSet(ViewSet):
     
     def delete_image(self, request, category=None, id=None, image_id=None):
         """Delete a specific image from a specific art piece by category, art piece ID, and image ID."""
-        
+
         model, error = self.get_model_or_400(category)
 
         if error:

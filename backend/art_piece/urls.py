@@ -25,8 +25,8 @@ image_detail_view = ArtPieceViewSet.as_view({
 })
 
 urlpatterns = [
-    path("art-pieces/", list_view),
-    path("art-pieces/<str:category>/", category_view),
+    path("art-pieces", list_view),
+    path("art-pieces/<str:category>", category_view),
     path("art-pieces/<str:category>/<int:id>", detail_view),
     path("art-pieces/<str:category>/<int:id>/images", image_view),
     path("art-pieces/<str:category>/<int:id>/images/<int:image_id>", image_detail_view)
