@@ -94,6 +94,8 @@ class ArtPieceViewSet(ViewSet):
             "multipart/form-data": serializers.ArtPieceAddImageRequestSerializer}
     )
     def add_images(self, request, category=None, id=None):
+        """Add images to a specific art piece by category and ID."""
+
         model, error = self.get_model_or_400(category)
 
         if error:
@@ -109,6 +111,8 @@ class ArtPieceViewSet(ViewSet):
         return Response(serializer.data)        
     
     def delete_image(self, request, category=None, id=None, image_id=None):
+        """Delete a specific image from a specific art piece by category, art piece ID, and image ID."""
+        
         model, error = self.get_model_or_400(category)
 
         if error:

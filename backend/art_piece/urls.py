@@ -1,6 +1,7 @@
 from django.urls import path
 from .views import ArtPieceViewSet
 
+# URL patterns for the art_piece app, mapping endpoints to the ArtPieceViewSet methods.
 list_view = ArtPieceViewSet.as_view({
     "get": "list"
 })
