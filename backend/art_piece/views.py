@@ -63,7 +63,7 @@ class ArtPieceViewSet(ViewSet):
         model, error = self.get_model_or_400(category)
         if error:
             return error
-        
+
         data = request.data.copy()
         data["category"] = category
 

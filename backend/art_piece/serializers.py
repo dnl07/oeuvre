@@ -70,10 +70,14 @@ class ArtPiecePolymorphicSerializer(serializers.Serializer):
         category = data.get("category")
         if not category:
             raise serializers.ValidationError({"category": "Required field"})
+        
+        if self.partial:
+            data = {k: v for k, v in data.items() if v != ""}
+        
         serializer_class = self.get_serializer(category)
         inner = serializer_class(self.instance, data=data, context=self.context, partial=self.partial)
-        inner.is_valid(raise_exception=True)
 
+        inner.is_valid(raise_exception=True)
         validated = inner.validated_data
         validated["category"] = category
         return validated
