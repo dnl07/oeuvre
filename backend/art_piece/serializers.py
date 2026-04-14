@@ -3,6 +3,8 @@ from rest_framework import serializers
 from drf_spectacular.utils import PolymorphicProxySerializer
 from images.serializers import ImageSerializer, UploadedImagesField
 from images.models import Image
+from .validators import validate_year
+
 
 # Base serializer with common fields
 class ArtPieceBaseSerializer(serializers.ModelSerializer):
@@ -11,6 +13,10 @@ class ArtPieceBaseSerializer(serializers.ModelSerializer):
     
     class Meta:
         abstract = True
+
+    def validate_year(self, value):
+        validate_year(value, drf=True)
+        return value
 
 # Specific serializers for each category
 class PaintingSerializer(ArtPieceBaseSerializer):

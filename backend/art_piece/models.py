@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.contenttypes.fields import GenericRelation
 from images.models import Image
 from django.utils.text import slugify
+from .validators import validate_year
+
 
 CATEGORY_CHOICES = [
     ("painting", "Painting"),
@@ -19,7 +21,7 @@ class ArtPieceBase(models.Model):
     slug = models.SlugField(unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
     location = models.CharField(max_length=255, blank=True, null=True)
-    year = models.CharField(max_length=10, blank=True, null=True)
+    year = models.CharField(max_length=10, blank=True, null=True, validators=[validate_year])
 
     images = GenericRelation(Image)
 
