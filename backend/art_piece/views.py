@@ -5,9 +5,8 @@ from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema
 from . import serializers
 from . import models
-from itertools import chain
 from images.models import Image
-from .filters import ArtPiecePolymorphicFilter
+from .filters import ArtPiecePolymorphicFilter, CATEGORY_PARAMS
 from .swagger import art_piece_list_schema
 
 
@@ -29,9 +28,13 @@ class ArtPieceViewSet(ViewSet):
     def list(self, request):
         """List all art pieces across all categories."""
 
-        queryset = ArtPiecePolymorphicFilter(request.query_params).apply()
+        queryset, meta = ArtPiecePolymorphicFilter(request.query_params).apply()
+
         serializer = serializers.ArtPiecePolymorphicSerializer(queryset, many=True)
-        return Response(serializer.data)
+        return Response({
+            "results": serializer.data,
+            "meta": meta
+        })
 
     def retrieve_by_id(self, request, category=None, id=None):
         """Retrieve a specific art piece by category and ID."""

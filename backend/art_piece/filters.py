@@ -2,6 +2,9 @@ from django.db.models.functions import Cast, Lower
 from abc import ABC, abstractmethod
 from django.http import QueryDict
 from . import models
+from itertools import chain
+from collections import Counter
+
 
 def filter_qs_by_field_in_list_ci(qs: QueryDict, field: str, lst: list[str]):
     return qs.annotate(field_lower=Lower(field)).filter(field_lower__in=[l.lower() for l in lst])
@@ -121,22 +124,52 @@ class OtherFilter(BaseCategoryFilter):
     
     def _apply_category_filters(self, qs):
         return qs
-
-FILTERS_MAP = {
-    "painting": PaintingFilter,
-    "architecture": ArchitectureFilter,
-    "sculpture": SculptureFilter,
-    "photography": PhotographyFilter,
-    "other": OtherFilter    
+    
+BASE_CONFIG = {
+    "fields": {
+        "year": "year",
+        "location": "locations"
+    }
 }
 
-CATEGORY_PARAMS = {
-    "painting": {"artists", "techniques", "measurements"},
-    "architecture": {"architects"},
-    "sculpture": {"artists", "materials"},
-    "photography": {"photographers", "cameras"},
-    "other": set(),
+CATEGORY_CONFIG = {
+    "painting": {
+        "filter": PaintingFilter,
+        "fields": {
+            "artist": "artists",
+            "technique": "techniques", 
+            "measurements": "measurements"
+        }
+    },
+    "architecture": {
+        "filter": ArchitectureFilter,
+        "fields": {
+            "architect": "architects"
+        }
+    },
+    "sculpture": {
+        "filter": SculptureFilter,
+        "fields": {
+            "artist": "artists",
+            "material": "materials"
+        }
+    },
+    "photography": {
+        "filter": PhotographyFilter,
+        "fields": {
+            "photographer": "photographers",
+            "camera": "cameras"
+        }
+    },
+    "other": {
+        "filter": OtherFilter,
+        "fields": {}
+    },
 }
+
+FILTERS_MAP = {k: v["filter"] for k, v in CATEGORY_CONFIG.items()}
+
+CATEGORY_PARAMS = {k: set(v["fields"].values()) for k, v in CATEGORY_CONFIG.items()}
 
 class ArtPiecePolymorphicFilter:
     """Polymorphic filter that applies the appropriate category filter based on query parameters."""
@@ -152,7 +185,6 @@ class ArtPiecePolymorphicFilter:
 
         if query_categories:
             for category in query_categories:
-                print(category)
                 if category not in FILTERS_MAP.keys():
                     raise ValueError(f"Unknown category: {category}")
                 
@@ -169,11 +201,40 @@ class ArtPiecePolymorphicFilter:
 
         return selected
 
+    def _build_meta(self, querysets: list):
+        meta = {}
+
+        for qs in querysets:
+            if not qs.exists():
+                continue
+
+            model_name = qs.model.__name__.lower()
+            fields = {**BASE_CONFIG["fields"], **CATEGORY_CONFIG[model_name]["fields"]}
+
+            for db_field, param_name in fields.items():
+                values = list(qs.values_list(db_field, flat=True))
+                
+                values = [v for v in values if v is not None and v != ""]
+
+                if len(values) == 0:
+                    continue
+
+                if param_name not in meta:
+                    meta[param_name] = Counter()
+
+                meta[param_name].update(values)
+
+        return {k: dict(v.most_common()) for k, v in meta.items()}
+
     def apply(self):
-        results = []
+        querysets = []
         selected = self._selected_categories()
 
         for category, filter_class in FILTERS_MAP.items():
             if category in selected:
-                results.extend(list(filter_class(self.query_params).apply()))
-        return results
+                querysets.append(filter_class(self.query_params).apply())
+        
+        meta = self._build_meta(querysets)
+        results = list(chain(*querysets))
+
+        return results, meta
