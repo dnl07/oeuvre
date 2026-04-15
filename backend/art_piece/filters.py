@@ -203,17 +203,21 @@ class ArtPiecePolymorphicFilter:
 
     def _build_meta(self, querysets: list):
         meta = {}
+        categories = []
 
         for qs in querysets:
             if not qs.exists():
                 continue
 
             model_name = qs.model.__name__.lower()
+
+            categories.extend([v.category for v in qs])
+
             fields = {**BASE_CONFIG["fields"], **CATEGORY_CONFIG[model_name]["fields"]}
 
             for db_field, param_name in fields.items():
                 values = list(qs.values_list(db_field, flat=True))
-                
+
                 values = [v for v in values if v is not None and v != ""]
 
                 if len(values) == 0:
@@ -224,6 +228,7 @@ class ArtPiecePolymorphicFilter:
 
                 meta[param_name].update(values)
 
+        meta["categories"] = Counter(categories)
         return {k: dict(v.most_common()) for k, v in meta.items()}
 
     def apply(self):
