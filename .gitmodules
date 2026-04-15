@@ -1,0 +1,3 @@
+[submodule "backend/services/SearchEngine"]
+	path = backend/services/SearchEngine
+	url = git@github.com:dnl07/SearchEngine.git

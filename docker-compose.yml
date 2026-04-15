@@ -1,0 +1,26 @@
+services:
+ backend:
+  build:
+   context: ./backend
+   dockerfile: Dockerfile
+  volumes:
+   - backend_data:/app/backend_data
+  ports: 
+   - "8000:8000"
+  depends_on:
+   - search-engine
+  restart: unless-stopped
+
+ search-engine:
+  build:
+   context: ./backend/services/SearchEngine
+   dockerfile: Dockerfile
+  ports:
+   - "5003:5000"
+  volumes:
+   - search_engine_data:/app/search_engine_data
+  restart: unless-stopped
+
+volumes:
+  backend_data:
+  search_engine_data:
