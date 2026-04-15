@@ -3,7 +3,7 @@ from rest_framework import serializers
 from drf_spectacular.utils import PolymorphicProxySerializer
 from images.serializers import ImageSerializer, UploadedImagesField
 from images.models import Image
-from .validators import validate_year
+from .validators import validate_year, validate_measurements
 
 
 # Base serializer with common fields
@@ -24,6 +24,10 @@ class PaintingSerializer(ArtPieceBaseSerializer):
         model = models.Painting
         fields = "__all__"
         read_only_fields = ["id", "slug"]
+
+    def validate_measurements(self, value):
+        validate_measurements(value, drf=True)
+        return value
 
 class ArchitectureSerializer(ArtPieceBaseSerializer):
     class Meta:

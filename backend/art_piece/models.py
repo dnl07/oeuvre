@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.contenttypes.fields import GenericRelation
 from images.models import Image
 from django.utils.text import slugify
-from .validators import validate_year
+from .validators import validate_year, validate_measurements
 
 
 CATEGORY_CHOICES = [
@@ -51,7 +51,7 @@ class ArtPieceBase(models.Model):
 class Painting(ArtPieceBase):
     artist = models.CharField(max_length=255, blank=True, null=True)
     technique = models.CharField(max_length=255, blank=True, null=True)
-    measurements = models.CharField(max_length=255, blank=True, null=True)
+    measurements = models.CharField(max_length=255, blank=True, null=True, validators=[validate_measurements])
 
 class Architecture(ArtPieceBase):
     architect = models.CharField(max_length=255, blank=True, null=True)
