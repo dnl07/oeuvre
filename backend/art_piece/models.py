@@ -21,7 +21,7 @@ class ArtPieceBase(models.Model):
     slug = models.SlugField(unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
     location = models.CharField(max_length=255, blank=True, null=True)
-    year = models.CharField(max_length=10, blank=True, null=True, validators=[validate_year])
+    year = models.CharField(max_length=14, blank=True, null=True, validators=[validate_year])
 
     images = GenericRelation(Image)
 

@@ -39,7 +39,7 @@ class ArtPieceViewSet(ViewSet):
     def retrieve_by_id(self, request, category=None, id=None):
         """Retrieve a specific art piece by category and ID."""
 
-        model, error = self.get_model_or_400(category)
+        model, error = self._get_model_or_400(category)
         if error:
             return error
         instance = get_object_or_404(model, pk=id)
@@ -49,7 +49,7 @@ class ArtPieceViewSet(ViewSet):
     def delete_by_id(self, request, category=None, id=None):
         """Delete a specific art piece by category and ID."""
 
-        model, error = self.get_model_or_400(category)
+        model, error = self._get_model_or_400(category)
         if error:
             return error
         instance = get_object_or_404(model, pk=id)
@@ -66,7 +66,7 @@ class ArtPieceViewSet(ViewSet):
     def partial_update_by_id(self, request, category=None, id=None):
         """Partially update a specific art piece by category and ID."""
 
-        model, error = self.get_model_or_400(category)
+        model, error = self._get_model_or_400(category)
         if error:
             return error
 
@@ -102,7 +102,7 @@ class ArtPieceViewSet(ViewSet):
     def add_images(self, request, category=None, id=None):
         """Add images to a specific art piece by category and ID."""
  
-        model, error = self.get_model_or_400(category)
+        model, error = self._get_model_or_400(category)
 
         if error:
             return error
@@ -119,7 +119,7 @@ class ArtPieceViewSet(ViewSet):
     def delete_image(self, request, category=None, id=None, image_id=None):
         """Delete a specific image from a specific art piece by category, art piece ID, and image ID."""
 
-        model, error = self.get_model_or_400(category)
+        model, error = self._get_model_or_400(category)
 
         if error:
             return error
