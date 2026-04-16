@@ -33,7 +33,7 @@ class ArtPieceBase(models.Model):
 
     def save(self, *args, **kwargs):
         # Automatically set the category based on the model name
-        category = self.__class__.__name__.lower();
+        category = self.__class__.__name__.lower()
         allowed = [choice[0] for choice in CATEGORY_CHOICES]
 
         if category not in allowed:

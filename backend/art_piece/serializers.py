@@ -97,7 +97,7 @@ class ArtPiecePolymorphicSerializer(serializers.Serializer):
         uploaded_images = validated_data.pop("uploaded_images", [])
 
         if not uploaded_images or len(uploaded_images) == 0:
-            return serializers.ValidationError({"uploaded_images": "Atleast one image is required"})
+            raise serializers.ValidationError({"uploaded_images": "Atleast one image is required"})
 
         model = models.MODEL_MAP.get(category)
         instance = model.objects.create(**validated_data)
