@@ -34,6 +34,23 @@ class SearchEngineService:
         response.raise_for_status()
         return response.json()
 
+    def index_item(self, item: IndexItem):
+        item = {
+            "id": str(item.id),
+            "title": item.title,
+            "description": item.description,
+            "tags": item.tags
+        }
+
+        response = requests.post(
+            f"{self.base_url}/documents",
+            json=item,
+            timeout=self.timeout
+        )
+        
+        response.raise_for_status()
+        return response.json()
+
     def index_items_bulk(self, items: list[IndexItem]):
         """Index a list of items in bulk by sending them to the search engine's bulk indexing endpoint."""
         items_json = []
@@ -53,6 +70,41 @@ class SearchEngineService:
             json=items_json,
             timeout=self.timeout
         )
+        response.raise_for_status()
+        return response.json()
+    
+    def update_item(self, item: IndexItem):
+        payload = {
+            "title": item.title,
+            "description": item.description,
+            "tags": item.tags
+        }       
+
+        params = {
+            "id": str(item.id)
+        }
+
+        response = requests.patch(
+            f"{self.base_url}/documents",
+            params=params,
+            json=payload,
+            timeout=self.timeout
+        )
+
+        response.raise_for_status()
+        return response.json()
+    
+    def delete_item(self, id: str | uuid.UUID):
+        params = {
+            "id": str(id)
+        }
+
+        response = requests.delete(
+            f"{self.base_url}/documents",
+            params=params,
+            timeout=self.timeout
+        )
+
         response.raise_for_status()
         return response.json()
 

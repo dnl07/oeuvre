@@ -4,7 +4,7 @@ from drf_spectacular.utils import PolymorphicProxySerializer
 from images.serializers import ImageSerializer, UploadedImagesField
 from images.models import Image
 from .validators import validate_year, validate_measurements
-
+from .services import ArtPieceService
 
 # Base serializer with common fields
 class ArtPieceBaseSerializer(serializers.ModelSerializer):
@@ -100,10 +100,8 @@ class ArtPiecePolymorphicSerializer(serializers.Serializer):
             raise serializers.ValidationError({"uploaded_images": "Atleast one image is required"})
 
         model = models.MODEL_MAP.get(category)
-        instance = model.objects.create(**validated_data)
-
-        for img in uploaded_images:
-            Image.objects.create(content_object=instance, image=img)
+        
+        instance = ArtPieceService.create(model, validated_data, uploaded_images)
 
         return instance
 

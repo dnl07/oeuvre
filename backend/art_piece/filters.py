@@ -4,7 +4,7 @@ from django.http import QueryDict
 from . import models
 from itertools import chain
 from collections import Counter
-from .services.search_engine.search_engine_service import SearchEngineService
+from commons.search.service import SearchEngineService
 
 def filter_qs_by_field_in_list_ci(qs: QueryDict, field: str, lst: list[str]):
     return qs.annotate(field_lower=Lower(field)).filter(field_lower__in=[l.lower() for l in lst])

@@ -1,6 +1,5 @@
-from .search_engine_service import SearchEngineService, IndexItem
 from art_piece import models
-
+from .service import IndexItem, SearchEngineService
 
 def _map_painting(obj: models.Painting) -> IndexItem:
     fields_for_description = ["location", "artist", "technique"]
