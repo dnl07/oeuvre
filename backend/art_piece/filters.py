@@ -19,15 +19,14 @@ class BaseCategoryFilter(ABC):
         self.year = query_params.get("year")
         self.locations = query_params.getlist("locations")
         
-    def apply(self, selected_pks=None):
+    def apply(self, search_ids=None):
         if self.model is None:
             return []
 
         qs = self.model.objects.prefetch_related("images")
 
-        if selected_pks is not None:
-            print(selected_pks)
-            qs = qs.filter(pk__in=selected_pks)
+        if search_ids:
+            qs = qs.filter(search_id__in=search_ids)
 
         qs = self._apply_base_filters(qs)
         qs = self._apply_category_filters(qs)
@@ -209,28 +208,21 @@ class ArtPiecePolymorphicFilter:
 
         return selected
     
-    def _search(self) -> dict[str, list[int]]:
-        """Perform a search and return a mapping of category to list of matching primary keys."""
-        category_ids = {}
+    def _search(self) -> list[int]:
+        """Perform a search and return a list of search ids."""
+        search_ids = []
 
         query = self.query_params.get("query")
 
         if not query or query.strip() == "":
-            return category_ids
+            return search_ids
 
         engine = SearchEngineService()
+
         hits = engine.search(query)["hits"]
+        search_ids = [hit["id"] for hit in hits]
 
-        for hit in hits:
-            category = hit["fields"]["metadata"]["category"]            
-            pk = hit["fields"]["metadata"]["pk"]
-
-            if category not in category_ids:
-                category_ids[category] = []
-            
-            category_ids[category].append(int(pk))
-
-        return category_ids
+        return search_ids
         
     def _build_meta(self, querysets: list):
         """Build metadata for the filtered results, including counts of unique values for each filterable field."""
@@ -266,18 +258,13 @@ class ArtPiecePolymorphicFilter:
     def apply(self):
         """Apply the appropriate filters based on query parameters and return the filtered results."""
         querysets = []
-        selected = self._select_categories()
 
-        category_ids_search = self._search()
+        selected = self._select_categories()
+        search_ids = self._search()
 
         for category, filter_class in FILTERS_MAP.items():
             if category in selected:
-                selected_pks_from_search = [] if len(category_ids_search.keys()) > 0 else None
-
-                if category in category_ids_search:
-                    selected_pks_from_search = category_ids_search[category]
-
-                querysets.append(filter_class(self.query_params).apply(selected_pks_from_search))
+                querysets.append(filter_class(self.query_params).apply(search_ids))
         
         meta = self._build_meta(querysets)
         results = list(chain(*querysets))

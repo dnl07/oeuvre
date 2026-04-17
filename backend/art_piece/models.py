@@ -4,6 +4,7 @@ from images.models import Image
 from django.utils.text import slugify
 from .validators import validate_year, validate_measurements
 from .normalize import normalize_name, normalize_sentence
+import uuid
 
 CATEGORY_CHOICES = [
     ("painting", "Painting"),
@@ -24,6 +25,8 @@ class ArtPieceBase(models.Model):
     year = models.CharField(max_length=14, blank=True, null=True, validators=[validate_year])
 
     images = GenericRelation(Image)
+
+    search_id = models.UUIDField(unique=True, default=uuid.uuid4, editable=False)
 
     NORMALIZE_NAME_FIELDS = []
     NORMALIZE_SENTENCE_FIELDS = ["location"]

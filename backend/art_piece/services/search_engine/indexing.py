@@ -7,14 +7,10 @@ def _map_painting(obj: models.Painting) -> IndexItem:
     description = ", ".join([getattr(obj, f) for f in fields_for_description if getattr(obj, f)])
 
     return IndexItem(
-        id=obj.pk,
+        id=obj.search_id,
         title=obj.title,
         description=description,
-        tags=["painting"],
-        metadata={
-            "category": obj.category,
-            "pk": str(obj.pk)
-        }
+        tags=["painting"]
     )
 
 def _map_architecture(obj: models.Architecture) -> IndexItem:
@@ -22,14 +18,10 @@ def _map_architecture(obj: models.Architecture) -> IndexItem:
     description = ", ".join([getattr(obj, f) for f in fields_for_description if getattr(obj, f)])
 
     return IndexItem(
-        id=obj.pk,
+        id=obj.search_id,
         title=obj.title,
         description=description,
-        tags=["architecture"],
-        metadata={
-            "category": obj.category,
-            "pk": str(obj.pk)
-        }
+        tags=["architecture"]
     )
 
 def _map_sculpture(obj: models.Sculpture) -> IndexItem:
@@ -37,14 +29,10 @@ def _map_sculpture(obj: models.Sculpture) -> IndexItem:
     description = ", ".join([getattr(obj, f) for f in fields_for_description if getattr(obj, f)])
 
     return IndexItem(
-        id=obj.pk,
+        id=obj.search_id,
         title=obj.title,
         description=description,
-        tags=["sculpture"],
-        metadata={
-            "category": obj.category,
-            "pk": str(obj.pk)
-        }
+        tags=["sculpture"]
     )
 
 def _map_photography(obj: models.Photography) -> IndexItem:
@@ -52,14 +40,10 @@ def _map_photography(obj: models.Photography) -> IndexItem:
     description = ", ".join([getattr(obj, f) for f in fields_for_description if getattr(obj, f)])
 
     return IndexItem(
-        id=obj.pk,
+        id=obj.search_id,
         title=obj.title,
         description=description,
-        tags=["photography"],
-        metadata={
-            "category": obj.category,
-            "pk": str(obj.pk)
-        }
+        tags=["photography"]
     )
 
 def _map_other(obj: models.Other) -> IndexItem:
@@ -67,14 +51,10 @@ def _map_other(obj: models.Other) -> IndexItem:
     description = ", ".join([getattr(obj, f) for f in fields_for_description if getattr(obj, f)])
 
     return IndexItem(
-        id=obj.pk,
+        id=obj.search_id,
         title=obj.title,
         description=description,
-        tags=["other"],
-        metadata={
-            "category": obj.category,
-            "pk": str(obj.pk)
-        }
+        tags=["other"]
     )
 
 MAPPER_MAP = {

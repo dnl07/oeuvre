@@ -14,7 +14,7 @@ class ImageInlineAdmin(GenericTabularInline):
 class ArtPieceBaseAdmin(admin.ModelAdmin):
     list_display = ["id", "title", "image_count"]
     inlines = [ImageInlineAdmin]
-    readonly_fields = ["slug", "created_at"]
+    readonly_fields = ["slug", "created_at", "search_id"]
     ordering = ("-created_at",)
 
     def get_queryset(self, request):
@@ -30,15 +30,18 @@ class PaintingAdmin(ArtPieceBaseAdmin):
 
 @admin.register(Architecture)
 class ArchitectureAdmin(ArtPieceBaseAdmin):
-    pass
+    list_display = ArtPieceBaseAdmin.list_display + ["architect"]
+
 
 @admin.register(Sculpture)
 class SculptureAdmin(ArtPieceBaseAdmin):
-    pass
+    list_display = ArtPieceBaseAdmin.list_display + ["artist"]
+
 
 @admin.register(Photography)
 class PhotographyAdmin(ArtPieceBaseAdmin):
-    pass
+    list_display = ArtPieceBaseAdmin.list_display + ["photographer"]
+
 
 @admin.register(Other)
 class OtherAdmin(ArtPieceBaseAdmin):
