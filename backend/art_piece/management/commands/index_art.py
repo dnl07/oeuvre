@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 from commons.search.service import SearchEngineService
-from commons.search.indexing import index_all_art_pieces
+from art_piece.indexing.indexer import index_all_art_pieces
 
 class Command(BaseCommand):
     help = "Indexes all art pieces into the search engine"

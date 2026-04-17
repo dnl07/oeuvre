@@ -80,33 +80,23 @@ class SearchEngineService:
             "tags": item.tags
         }       
 
-        params = {
-            "id": str(item.id)
-        }
-
         response = requests.patch(
-            f"{self.base_url}/documents",
-            params=params,
+            f"{self.base_url}/documents/{str(item.id)}",
             json=payload,
             timeout=self.timeout
         )
 
+        print(response.text)
+
         response.raise_for_status()
-        return response.json()
     
     def delete_item(self, id: str | uuid.UUID):
-        params = {
-            "id": str(id)
-        }
-
         response = requests.delete(
-            f"{self.base_url}/documents",
-            params=params,
+            f"{self.base_url}/documents/{str(id)}",
             timeout=self.timeout
         )
 
         response.raise_for_status()
-        return response.json()
 
     def search(self, query: str):
         """Perform a search query against the search engine and return the results."""

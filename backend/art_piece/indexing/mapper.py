@@ -1,5 +1,5 @@
+from commons.search.service import IndexItem
 from art_piece import models
-from .service import IndexItem, SearchEngineService
 
 def _map_painting(obj: models.Painting) -> IndexItem:
     fields_for_description = ["location", "artist", "technique"]
@@ -57,19 +57,14 @@ def _map_other(obj: models.Other) -> IndexItem:
     )
 
 MAPPER_MAP = {
-    "painting": (models.Painting, _map_painting),
-    "architecture": (models.Architecture, _map_architecture),
-    "sculpture": (models.Sculpture, _map_sculpture),
-    "photography": (models.Photography, _map_photography),
-    "other": (models.Other, _map_other),
+    models.Painting: _map_painting,
+    models.Architecture: _map_architecture,
+    models.Sculpture: _map_sculpture,
+    models.Photography: _map_photography,
+    models.Other: _map_other,
 }
 
-def index_all_art_pieces():
-    engine = SearchEngineService()
-
-    items = []
-    for (model, mapper) in MAPPER_MAP.values():
-        for obj in model.objects.all():
-            items.append(mapper(obj))
-
-    engine.index_items_bulk(items)
+def map_art_piece(obj):
+    model = type(obj)
+    mapper = MAPPER_MAP.get(model)
+    return mapper(obj)
