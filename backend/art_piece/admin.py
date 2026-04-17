@@ -2,36 +2,44 @@ from django.contrib import admin
 from .models import Painting, Architecture, Sculpture, Photography, Other
 from images.models import Image
 from django.contrib.contenttypes.admin import GenericTabularInline
+from django.db.models import Count
 
 
 class ImageInlineAdmin(GenericTabularInline):
     model = Image
     extra = 1
-    fields = ["image", "alt_text"]
+    fields = ["image"]
     readonly_fields = ["created_at"]
 
-@admin.register(Painting)
-class PaintingAdmin(admin.ModelAdmin):
-    list_display = ["id", "title"]
+class ArtPieceBaseAdmin(admin.ModelAdmin):
+    list_display = ["id", "title", "image_count"]
+    inlines = [ImageInlineAdmin]
     readonly_fields = ["slug", "created_at"]
-    inlines = [ImageInlineAdmin, ]
+    ordering = ("-created_at",)
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).annotate(_image_count=Count("images"))
+
+    @admin.action(description="Images")
+    def image_count(self, obj):
+        return obj._image_count
+
+@admin.register(Painting)
+class PaintingAdmin(ArtPieceBaseAdmin):
+    list_display = ArtPieceBaseAdmin.list_display + ["artist"]
 
 @admin.register(Architecture)
-class ArchitectureAdmin(admin.ModelAdmin):
-    list_display = ["id", "title"]
-    readonly_fields = ["slug", "created_at"]
+class ArchitectureAdmin(ArtPieceBaseAdmin):
+    pass
 
 @admin.register(Sculpture)
-class SculptureAdmin(admin.ModelAdmin):
-    list_display = ["id", "title"]
-    readonly_fields = ["slug", "created_at"]
+class SculptureAdmin(ArtPieceBaseAdmin):
+    pass
 
 @admin.register(Photography)
-class PhotographyAdmin(admin.ModelAdmin):
-    list_display = ["id", "title"]
-    readonly_fields = ["slug", "created_at"]
+class PhotographyAdmin(ArtPieceBaseAdmin):
+    pass
 
 @admin.register(Other)
-class OtherAdmin(admin.ModelAdmin):
-    list_display = ["id", "title"]
-    readonly_fields = ["slug", "created_at"]
+class OtherAdmin(ArtPieceBaseAdmin):
+    pass
