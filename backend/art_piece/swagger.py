@@ -5,6 +5,12 @@ def art_piece_list_schema():
     return extend_schema(
         parameters=[
             OpenApiParameter(
+                name="query",
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.QUERY,
+                description="Search"
+            ),
+            OpenApiParameter(
                 name="categories",
                 type={"type": "array", "items": {"type": "string"}},
                 location=OpenApiParameter.QUERY,

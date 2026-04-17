@@ -141,7 +141,9 @@ SPECTACULAR_SETTINGS = {
     'COMPONENT_SPLIT_REQUEST': True
 }
 
-SEARCH_ENGINE_URL = "http://search-engine:5000"
+SEARCH_ENGINE_URL = "http://localhost:5003"
+
+#if used with docker compose: "http://search-engine:5000"
 
 LOGGING = {
     'version': 1,

@@ -10,7 +10,11 @@ def _map_painting(obj: models.Painting) -> IndexItem:
         id=obj.pk,
         title=obj.title,
         description=description,
-        tags=["painting"]
+        tags=["painting"],
+        metadata={
+            "category": obj.category,
+            "pk": str(obj.pk)
+        }
     )
 
 def _map_architecture(obj: models.Architecture) -> IndexItem:
@@ -21,7 +25,11 @@ def _map_architecture(obj: models.Architecture) -> IndexItem:
         id=obj.pk,
         title=obj.title,
         description=description,
-        tags=["architecture"]
+        tags=["architecture"],
+        metadata={
+            "category": obj.category,
+            "pk": str(obj.pk)
+        }
     )
 
 def _map_sculpture(obj: models.Sculpture) -> IndexItem:
@@ -32,7 +40,11 @@ def _map_sculpture(obj: models.Sculpture) -> IndexItem:
         id=obj.pk,
         title=obj.title,
         description=description,
-        tags=["sculpture"]
+        tags=["sculpture"],
+        metadata={
+            "category": obj.category,
+            "pk": str(obj.pk)
+        }
     )
 
 def _map_photography(obj: models.Photography) -> IndexItem:
@@ -43,7 +55,11 @@ def _map_photography(obj: models.Photography) -> IndexItem:
         id=obj.pk,
         title=obj.title,
         description=description,
-        tags=["photography"]
+        tags=["photography"],
+        metadata={
+            "category": obj.category,
+            "pk": str(obj.pk)
+        }
     )
 
 def _map_other(obj: models.Other) -> IndexItem:
@@ -54,7 +70,11 @@ def _map_other(obj: models.Other) -> IndexItem:
         id=obj.pk,
         title=obj.title,
         description=description,
-        tags=["other"]
+        tags=["other"],
+        metadata={
+            "category": obj.category,
+            "pk": str(obj.pk)
+        }
     )
 
 MAPPER_MAP = {

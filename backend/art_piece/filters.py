@@ -4,7 +4,7 @@ from django.http import QueryDict
 from . import models
 from itertools import chain
 from collections import Counter
-
+from .services.search_engine.search_engine_service import SearchEngineService
 
 def filter_qs_by_field_in_list_ci(qs: QueryDict, field: str, lst: list[str]):
     return qs.annotate(field_lower=Lower(field)).filter(field_lower__in=[l.lower() for l in lst])
@@ -15,14 +15,20 @@ class BaseCategoryFilter(ABC):
     model = None
 
     def __init__(self, query_params):
+        self.query = query_params.get("query")
         self.year = query_params.get("year")
         self.locations = query_params.getlist("locations")
         
-    def apply(self):
+    def apply(self, selected_pks=None):
         if self.model is None:
             return []
 
         qs = self.model.objects.prefetch_related("images")
+
+        if selected_pks is not None:
+            print(selected_pks)
+            qs = qs.filter(pk__in=selected_pks)
+
         qs = self._apply_base_filters(qs)
         qs = self._apply_category_filters(qs)
         return qs
@@ -167,8 +173,10 @@ CATEGORY_CONFIG = {
     },
 }
 
+# Mapping of category name to its corresponding filter class for easy access in the polymorphic filter
 FILTERS_MAP = {k: v["filter"] for k, v in CATEGORY_CONFIG.items()}
 
+# Precompute the set of query parameter names associated with each category for category selection in the polymorphic filter
 CATEGORY_PARAMS = {k: set(v["fields"].values()) for k, v in CATEGORY_CONFIG.items()}
 
 class ArtPiecePolymorphicFilter:
@@ -177,7 +185,7 @@ class ArtPiecePolymorphicFilter:
     def __init__(self, query_params):
         self.query_params = query_params
 
-    def _selected_categories(self):
+    def _select_categories(self):
         """Determine which categories to filter based on the presence of category-specific query parameters."""
         selected = set()
 
@@ -200,8 +208,32 @@ class ArtPiecePolymorphicFilter:
             selected = set(FILTERS_MAP.keys())
 
         return selected
+    
+    def _search(self) -> dict[str, list[int]]:
+        """Perform a search and return a mapping of category to list of matching primary keys."""
+        category_ids = {}
 
+        query = self.query_params.get("query")
+
+        if not query or query.strip() == "":
+            return category_ids
+
+        engine = SearchEngineService()
+        hits = engine.search(query)["hits"]
+
+        for hit in hits:
+            category = hit["fields"]["metadata"]["category"]            
+            pk = hit["fields"]["metadata"]["pk"]
+
+            if category not in category_ids:
+                category_ids[category] = []
+            
+            category_ids[category].append(int(pk))
+
+        return category_ids
+        
     def _build_meta(self, querysets: list):
+        """Build metadata for the filtered results, including counts of unique values for each filterable field."""
         meta = {}
         categories = []
 
@@ -232,12 +264,20 @@ class ArtPiecePolymorphicFilter:
         return {k: dict(v.most_common()) for k, v in meta.items()}
 
     def apply(self):
+        """Apply the appropriate filters based on query parameters and return the filtered results."""
         querysets = []
-        selected = self._selected_categories()
+        selected = self._select_categories()
+
+        category_ids_search = self._search()
 
         for category, filter_class in FILTERS_MAP.items():
             if category in selected:
-                querysets.append(filter_class(self.query_params).apply())
+                selected_pks_from_search = [] if len(category_ids_search.keys()) > 0 else None
+
+                if category in category_ids_search:
+                    selected_pks_from_search = category_ids_search[category]
+
+                querysets.append(filter_class(self.query_params).apply(selected_pks_from_search))
         
         meta = self._build_meta(querysets)
         results = list(chain(*querysets))
