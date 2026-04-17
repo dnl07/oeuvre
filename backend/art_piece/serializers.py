@@ -106,9 +106,7 @@ class ArtPiecePolymorphicSerializer(serializers.Serializer):
         return instance
 
     def update(self, instance, validated_data):
-        for attr, value in validated_data.items():
-            setattr(instance, attr, value)
-        instance.save()
+        instance = ArtPieceService.update(instance, validated_data)    
         return instance
     
 # Serializer for Swagger documentation

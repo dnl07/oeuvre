@@ -12,6 +12,14 @@ class ArtPieceService:
         return instance
     
     @staticmethod
+    def update(instance, validated_data):
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+
+        return instance        
+    
+    @staticmethod
     def delete(instance):
         instance.delete()
 

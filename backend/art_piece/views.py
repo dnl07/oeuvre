@@ -8,7 +8,7 @@ from . import models
 from images.models import Image
 from .filters import ArtPiecePolymorphicFilter, CATEGORY_PARAMS
 from .swagger import art_piece_list_schema
-
+from .services import ArtPieceService
 
 class ArtPieceViewSet(ViewSet):
     """ViewSet for handling CRUD operations on art pieces across multiple categories."""
@@ -59,7 +59,8 @@ class ArtPieceViewSet(ViewSet):
         for image in images:
             image.delete()
 
-        instance.delete()
+        ArtPieceService.delete(instance)
+
         return Response(status=200)
     
     @extend_schema(request=serializers.ArtPiecePatchRequestSerializer)
