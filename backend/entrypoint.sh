@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 python manage.py migrate
 python manage.py index_art
