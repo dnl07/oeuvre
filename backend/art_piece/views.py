@@ -111,8 +111,7 @@ class ArtPieceViewSet(ViewSet):
         instance = get_object_or_404(model, pk=id)
         images = request.FILES.getlist("uploaded_images")
 
-        for image in images:
-            Image.objects.create(content_object=instance, image=image)
+        instance = ArtPieceService.add_images(instance, images)
     
         serializer = serializers.ArtPiecePolymorphicSerializer(instance)
         return Response(serializer.data)        
@@ -126,9 +125,7 @@ class ArtPieceViewSet(ViewSet):
             return error
         
         instance = get_object_or_404(model, pk=id)
-        image = instance.images.filter(pk=image_id)
-
-        image.delete()
+        instance = ArtPieceService.delete_image(instance, image_id)
 
         serializer = serializers.ArtPiecePolymorphicSerializer(instance)
         return Response(serializer.data)

@@ -37,3 +37,17 @@ class ArtPieceService:
         transaction.on_commit(
             lambda: SearchEngineService().delete_item(instance.search_id)
         )
+
+    @staticmethod
+    def add_images(instance, images):
+        for image in images:
+            Image.objects.create(content_object=instance, image=image)
+
+        return instance
+    
+    @staticmethod
+    def delete_image(instance, image_id):
+        image = instance.images.filter(pk=image_id)
+        image.delete()
+
+        return instance    
