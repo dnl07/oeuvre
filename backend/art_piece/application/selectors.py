@@ -1,5 +1,5 @@
 from .filters import ArtPiecePolymorphicFilter
-from .models import MODEL_MAP
+from ..domain.models import MODEL_MAP
 
 class ArtPieceSelector:
     @staticmethod

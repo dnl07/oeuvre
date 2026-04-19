@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Painting, Architecture, Sculpture, Photography, Other
+from .domain.models import Painting, Architecture, Sculpture, Photography, Other
 from images.models import Image
 from django.contrib.contenttypes.admin import GenericTabularInline
 from django.db.models import Count

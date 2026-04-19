@@ -23,6 +23,7 @@ ID_PARAMETER = OpenApiParameter(
 
 def art_piece_list_schema():
     return extend_schema(
+        operation_id="art_pieces_list",
         summary="List all art pieces",
         parameters=[
             OpenApiParameter(
@@ -115,6 +116,7 @@ def art_piece_list_schema():
 
 def art_piece_detail_schema():
     return extend_schema(
+        operation_id="art_pieces_retrieve",
         summary="Retrieve an art piece",
         parameters=[CATEGORY_PARAMETER, ID_PARAMETER],
         responses=ArtPieceSwaggerOutputSerializer
@@ -122,6 +124,7 @@ def art_piece_detail_schema():
 
 def art_piece_create_schema():
     return extend_schema(
+        operation_id="art_pieces_create",
         summary="Create an art piece",
         parameters=[CATEGORY_PARAMETER],
         request={"multipart/form-data": ArtPieceCreateRequestSerializer},
@@ -130,6 +133,7 @@ def art_piece_create_schema():
 
 def art_piece_update_schema():
     return extend_schema(
+        operation_id="art_pieces_update",
         summary="Update an art piece",
         parameters=[CATEGORY_PARAMETER],
         request={"multipart/form-data": ArtPiecePatchRequestSerializer},
@@ -138,6 +142,7 @@ def art_piece_update_schema():
 
 def art_piece_delete_schema():
     return extend_schema(
+        operation_id="art_pieces_delete",
         summary="Delete an art piece",
         parameters=[CATEGORY_PARAMETER, ID_PARAMETER],
         responses=ArtPieceSwaggerOutputSerializer

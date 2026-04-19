@@ -1,4 +1,4 @@
-from .. import models
+from ..domain import models
 from rest_framework import serializers
 from images.serializers import ImageSerializer, UploadedImagesField
 

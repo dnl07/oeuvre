@@ -1,8 +1,8 @@
 from images.models import Image
-from .indexing.mapper import map_art_piece
+from ..indexing.mapper import map_art_piece
 from commons.search.service import SearchEngineService
 from django.db import transaction
-from .models import ArtPieceBase, MODEL_MAP
+from ..domain.models import ArtPieceBase, MODEL_MAP
 
 class ArtPieceService:
     @staticmethod

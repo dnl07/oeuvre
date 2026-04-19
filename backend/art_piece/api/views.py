@@ -2,9 +2,9 @@ from rest_framework.views import APIView
 from rest_framework.response import Response 
 from rest_framework.serializers import Serializer 
 from rest_framework.parsers import MultiPartParser, FormParser
-from ..services import ArtPieceService
+from ..application.services import ArtPieceService
 from .serializers import get_input_serializer, get_output_serializer
-from ..selectors import ArtPieceSelector
+from ..application.selectors import ArtPieceSelector
 from .swagger import schemas
 
 class ArtPieceListApi(APIView):

@@ -1,7 +1,7 @@
 from django.db.models.functions import Lower
 from abc import ABC, abstractmethod
 from django.http import QueryDict
-from . import models
+from ..domain import models
 from itertools import chain
 from collections import Counter
 from commons.search.service import SearchEngineService
