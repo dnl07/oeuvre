@@ -36,6 +36,34 @@ class ArtPieceDetailApi(APIView):
         data = self.OutputSerializer(art_piece).data
         return Response(data)    
 
+    @schemas.art_piece_update_schema()
+    def patch(self, request, category: str, id: int):
+        input_serializer = get_input_serializer(category)
+
+        if not input_serializer:
+            return Response({"error": f"Unknown category: {category}"})
+
+        serializer = input_serializer(data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+
+        instance = ArtPieceSelector.art_piece_get(category, id)
+
+        instance = ArtPieceService.art_piece_update(
+            obj=instance,
+            data=serializer.validated_data,
+        )      
+
+        return Response(self.OutputSerializer(instance).data, status=200)
+    
+    @schemas.art_piece_delete_schema()
+    def delete(self, request, category: str, id: int):
+        instance = ArtPieceSelector.art_piece_get(category, id)
+
+        ArtPieceService.art_piece_delete(
+            obj=instance
+        )
+        return Response(status=204)  
+
 class ArtPieceCreateApi(APIView):
     parser_classes = [MultiPartParser, FormParser]
 
@@ -63,42 +91,6 @@ class ArtPieceCreateApi(APIView):
         )
 
         return Response(self.OutputSerializer(instance).data, status=201)
-
-class ArtPieceUpdateApi(APIView):
-    class OutputSerializer(Serializer):
-        def to_representation(self, instance):
-            serializer_class = get_output_serializer(instance.category)
-            return serializer_class(instance, context=self.context).data
-
-    def patch(self, request, category: str, id: int):
-        input_serializer = get_input_serializer(category)
-
-        if not input_serializer:
-            return Response({"error": f"Unknown category: {category}"})
-
-        serializer = input_serializer(data=request.data, partial=True)
-        serializer.is_valid(raise_exception=True)
-
-        instance = ArtPieceSelector.art_piece_get(category, id)
-
-        instance = ArtPieceService.art_piece_update(
-            obj=instance,
-            data=serializer.validated_data,
-        )      
-
-        return Response(self.OutputSerializer(instance).data, status=200)
-
-class ArtPieceDeleteApi(APIView):
-    def delete(self, request, category: str, id: int):
-        instance = ArtPieceSelector.art_piece_get(category, id)
-
-        ArtPieceService.art_piece_delete(
-            obj=instance, 
-            id=id
-        )
-        return Response(status=204)  
-
-
 
 
 """
