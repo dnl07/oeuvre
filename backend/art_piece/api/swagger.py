@@ -1,8 +1,10 @@
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from drf_spectacular.types import OpenApiTypes
+from .serializers import ArtPieceSwaggerOutputSerializer
 
 def art_piece_list_schema():
     return extend_schema(
+        summary="List all art pieces",
         parameters=[
             OpenApiParameter(
                 name="query",
@@ -88,5 +90,6 @@ def art_piece_list_schema():
                 explode=True,
                 description="Filter by cameras"
             ),
-        ]
+        ],
+        responses=ArtPieceSwaggerOutputSerializer
     )

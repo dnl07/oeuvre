@@ -1,4 +1,4 @@
-from django.db.models.functions import Cast, Lower
+from django.db.models.functions import Lower
 from abc import ABC, abstractmethod
 from django.http import QueryDict
 from . import models
