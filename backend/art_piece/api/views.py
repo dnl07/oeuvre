@@ -5,7 +5,7 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from ..services import ArtPieceService
 from .serializers import get_input_serializer, get_output_serializer
 from ..selectors import ArtPieceSelector
-from .swagger import art_piece_list_schema
+from .swagger import schemas
 
 class ArtPieceListApi(APIView):
     class OutputSerializer(Serializer):
@@ -13,7 +13,7 @@ class ArtPieceListApi(APIView):
             serializer_class = get_output_serializer(instance.category)
             return serializer_class(instance, context=self.context).data
 
-    @art_piece_list_schema()
+    @schemas.art_piece_list_schema()
     def get(self, request):
         art_pieces, meta = ArtPieceSelector.art_piece_list(request.query_params)
 
@@ -30,6 +30,7 @@ class ArtPieceDetailApi(APIView):
             serializer_class = get_output_serializer(instance.category)
             return serializer_class(instance, context=self.context).data
 
+    @schemas.art_piece_detail_schema()
     def get(self, request, category: str, id: int):
         art_piece = ArtPieceSelector.art_piece_get(category, id)
         data = self.OutputSerializer(art_piece).data
@@ -43,6 +44,7 @@ class ArtPieceCreateApi(APIView):
             serializer_class = get_output_serializer(instance.category)
             return serializer_class(instance, context=self.context).data
 
+    @schemas.art_piece_create_schema()
     def post(self, request, category):
         input_serializer = get_input_serializer(category)
 

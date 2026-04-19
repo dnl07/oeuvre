@@ -1,6 +1,22 @@
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from drf_spectacular.types import OpenApiTypes
-from .serializers import ArtPieceSwaggerOutputSerializer
+from .serializers import ArtPieceSwaggerOutputSerializer, ArtPieceCreateRequestSerializer
+
+CATEGORY_PARAMETER = OpenApiParameter(
+    name="category",
+    type=OpenApiTypes.STR,
+    location=OpenApiParameter.PATH,
+    enum=["painting", "architecture", "sculpture", "photography", "other"],
+    description="Art piece category"
+)
+
+ID_PARAMETER = OpenApiParameter(
+    name="id",
+    type=OpenApiTypes.INT,
+    location=OpenApiParameter.PATH,
+    description="Art piece id"
+)
+
 
 def art_piece_list_schema():
     return extend_schema(
@@ -92,4 +108,19 @@ def art_piece_list_schema():
             ),
         ],
         responses=ArtPieceSwaggerOutputSerializer
+    )
+
+def art_piece_detail_schema():
+    return extend_schema(
+        summary="Create an art piece",
+        parameters=[CATEGORY_PARAMETER, ID_PARAMETER],
+        responses=ArtPieceSwaggerOutputSerializer
+    )
+
+def art_piece_create_schema():
+    return extend_schema(
+        summary="Create an art piece",
+        parameters=[CATEGORY_PARAMETER],
+        request={"multipart/form-data": ArtPieceCreateRequestSerializer},
+        responses={201: ArtPieceSwaggerOutputSerializer},
     )
