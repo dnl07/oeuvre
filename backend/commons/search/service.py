@@ -100,6 +100,7 @@ class SearchEngineService:
 
     def search(self, query: str):
         """Perform a search query against the search engine and return the results."""
+
         params = {"query": query}
 
         response = requests.get(

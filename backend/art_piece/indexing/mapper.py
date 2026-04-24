@@ -1,5 +1,5 @@
 from commons.search.service import IndexItem
-from art_piece import models
+from ..domain import models
 
 def _map_painting(obj: models.Painting) -> IndexItem:
     fields_for_description = ["location", "artist", "technique"]

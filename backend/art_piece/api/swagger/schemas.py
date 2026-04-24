@@ -1,8 +1,30 @@
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from drf_spectacular.types import OpenApiTypes
+from .serializers import (
+    ArtPieceSwaggerOutputSerializer, 
+    ArtPieceCreateRequestSerializer, 
+    ArtPiecePatchRequestSerializer
+)
+
+CATEGORY_PARAMETER = OpenApiParameter(
+    name="category",
+    type=OpenApiTypes.STR,
+    location=OpenApiParameter.PATH,
+    enum=["painting", "architecture", "sculpture", "photography", "other"],
+    description="Art piece category"
+)
+
+ID_PARAMETER = OpenApiParameter(
+    name="id",
+    type=OpenApiTypes.INT,
+    location=OpenApiParameter.PATH,
+    description="Art piece id"
+)
 
 def art_piece_list_schema():
     return extend_schema(
+        operation_id="art_pieces_list",
+        summary="List all art pieces",
         parameters=[
             OpenApiParameter(
                 name="query",
@@ -88,5 +110,40 @@ def art_piece_list_schema():
                 explode=True,
                 description="Filter by cameras"
             ),
-        ]
+        ],
+        responses=ArtPieceSwaggerOutputSerializer
+    )
+
+def art_piece_detail_schema():
+    return extend_schema(
+        operation_id="art_pieces_retrieve",
+        summary="Retrieve an art piece",
+        parameters=[CATEGORY_PARAMETER, ID_PARAMETER],
+        responses=ArtPieceSwaggerOutputSerializer
+    )
+
+def art_piece_create_schema():
+    return extend_schema(
+        operation_id="art_pieces_create",
+        summary="Create an art piece",
+        parameters=[CATEGORY_PARAMETER],
+        request={"multipart/form-data": ArtPieceCreateRequestSerializer},
+        responses={201: ArtPieceSwaggerOutputSerializer},
+    )
+
+def art_piece_update_schema():
+    return extend_schema(
+        operation_id="art_pieces_update",
+        summary="Update an art piece",
+        parameters=[CATEGORY_PARAMETER],
+        request={"multipart/form-data": ArtPiecePatchRequestSerializer},
+        responses={201: ArtPieceSwaggerOutputSerializer},
+    )
+
+def art_piece_delete_schema():
+    return extend_schema(
+        operation_id="art_pieces_delete",
+        summary="Delete an art piece",
+        parameters=[CATEGORY_PARAMETER, ID_PARAMETER],
+        responses=ArtPieceSwaggerOutputSerializer
     )

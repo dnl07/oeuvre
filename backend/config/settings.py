@@ -143,8 +143,6 @@ SPECTACULAR_SETTINGS = {
 
 SEARCH_ENGINE_URL = "http://search-engine:5000"
 
-#if used without docker compose: "http://localhost:5000"
-
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,

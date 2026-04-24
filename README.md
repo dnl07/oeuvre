@@ -1,6 +1,6 @@
 # oeuvre (in development!)
 
-## What is this?
+## What is **oeuvre**?
 
 **oeuvre** is a personal archive for people interested in art and art history. You can save and organise works you've encountered, across categories like paintings, sculptures, photographs and architecture, all in one place.
 The backend is built with Django and Django REST Framework. A React frontend is planned.
@@ -31,7 +31,7 @@ API docs are available at ```/api/docs``` once the server is running.
 ### Art pieces
 
 | Method | Endpoint | Description |
-| :--- | :---: | ---: |
+| :--- | :--- | ---: |
 | GET | `/api/art-pieces` | Retrieve a list of all art pieces |
 | POST | `/api/art-pieces/{category}` | Create a new art piece |
 | GET | `/api/art-pieces/{category}/{id}` | Retrieve a specific art piece |

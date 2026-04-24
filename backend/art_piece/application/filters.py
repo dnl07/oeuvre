@@ -1,7 +1,7 @@
-from django.db.models.functions import Cast, Lower
+from django.db.models.functions import Lower
 from abc import ABC, abstractmethod
 from django.http import QueryDict
-from . import models
+from ..domain import models
 from itertools import chain
 from collections import Counter
 from commons.search.service import SearchEngineService
@@ -207,23 +207,7 @@ class ArtPiecePolymorphicFilter:
             selected = set(FILTERS_MAP.keys())
 
         return selected
-    
-    def _search(self) -> list[int]:
-        """Perform a search and return a list of search ids."""
-        search_ids = []
 
-        query = self.query_params.get("query")
-
-        if not query or query.strip() == "":
-            return search_ids
-
-        engine = SearchEngineService()
-
-        hits = engine.search(query)["hits"]
-        search_ids = [hit["id"] for hit in hits]
-
-        return search_ids
-        
     def _build_meta(self, querysets: list):
         """Build metadata for the filtered results, including counts of unique values for each filterable field."""
         meta = {}
@@ -255,12 +239,11 @@ class ArtPiecePolymorphicFilter:
         meta["categories"] = Counter(categories)
         return {k: dict(v.most_common()) for k, v in meta.items()}
 
-    def apply(self):
+    def apply(self, search_ids=None):
         """Apply the appropriate filters based on query parameters and return the filtered results."""
         querysets = []
 
         selected = self._select_categories()
-        search_ids = self._search()
 
         for category, filter_class in FILTERS_MAP.items():
             if category in selected:
